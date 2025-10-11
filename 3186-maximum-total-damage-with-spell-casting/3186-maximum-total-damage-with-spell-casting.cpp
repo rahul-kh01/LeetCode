@@ -1,33 +1,18 @@
 class Solution {
 public:
     long long maximumTotalDamage(vector<int>& power) {
-        // Step 1: Count frequency of each power
-        unordered_map<int, long long> freq;
-        for (int p : power) freq[p]++;
+        int n = power.size();
+        sort(power.begin(), power.end());
+        vector<long long> dp(n+2);
 
-        // Step 2: Extract and sort unique powers
-        vector<int> nums;
-        for (auto it : freq) nums.push_back(it.first);
-        sort(nums.begin(), nums.end());
-
-        int n = nums.size();
-        vector<long long> dp(n);
-
-        // Base case
-        dp[0] = freq[nums[0]] * nums[0];
-
-        // Step 3: Build dp array
-        for (int i = 1; i < n; i++) {
-            long long take = freq[nums[i]] * nums[i];
-            
-            // find previous power > 2 smaller
-            int j = i - 1;
-            while (j >= 0 && nums[i] - nums[j] <= 2) j--;
-            if (j >= 0) take += dp[j];
-
-            dp[i] = max(dp[i - 1], take);
+        int i = n-1, j = n-1, k = n-1;
+        while(i >= 0) {
+            while(j>=i && power[j] > power[i]+2) j--;
+            while(k>=0 && power[k] == power[i]) k --;
+            dp[k+1] = dp[i] = max(dp[i+1], power[i]*1ll*(i-k) + dp[j+1]);
+            i = k;
         }
 
-        return dp[n - 1];
+        return dp[0];
     }
 };
